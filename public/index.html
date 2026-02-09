@@ -935,12 +935,36 @@ function renderBoard() {
 function renderColumn(columnId, columnAgents, emptyText) {
   const el = document.getElementById(columnId);
 
+  // Preserve focused textarea state before re-render
+  const focused = el.querySelector('textarea:focus');
+  let focusedId = null;
+  let focusedValue = null;
+  let focusedSelStart = null;
+  let focusedSelEnd = null;
+  if (focused) {
+    focusedId = focused.id;
+    focusedValue = focused.value;
+    focusedSelStart = focused.selectionStart;
+    focusedSelEnd = focused.selectionEnd;
+  }
+
   if (columnAgents.length === 0) {
     el.innerHTML = `<div class="empty-state">${emptyText}</div>`;
     return;
   }
 
   el.innerHTML = columnAgents.map(a => renderCard(a)).join('');
+
+  // Restore focused textarea state after re-render
+  if (focusedId) {
+    const restored = document.getElementById(focusedId);
+    if (restored) {
+      restored.value = focusedValue;
+      restored.focus();
+      restored.selectionStart = focusedSelStart;
+      restored.selectionEnd = focusedSelEnd;
+    }
+  }
 }
 
 function renderCard(agent) {
